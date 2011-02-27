@@ -76,7 +76,16 @@ static int initialize(struct wrapper_struct *s) {
     return 0;
 }
 
-/* Perform syntax highlighting on a single string */
+/*
+ * call-seq:
+ *   wrapper.highlight_string(string, lexer, formatter) -> string
+ *
+ * This method performs syntax highlighting on a string. Do not call this
+ * function directly. Instead, use the Rygments.highlight functions.
+ *
+ * The return value is always a string. An exception is raised whenever
+ * an error occurs.
+ */
 static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE formatter) {
     struct wrapper_struct *s;
     PyObject *pArgs, *pValue;
@@ -116,7 +125,16 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
     return result;
 }
 
-/* Perform syntax highlighting on a file */
+/*
+ * call-seq:
+ *   wrapper.highlight_file(filename, lexer, formatter) -> string
+ *
+ * This method performs syntax highlighting on a file. Do not call this
+ * function directly. Instead, use the Rygments.highlight functions.
+ *
+ * The return value is always a string. An exception is raised whenever
+ * an error occurs.
+ */
 static VALUE wrapper_highlight_file(VALUE self, VALUE filename, VALUE lexer, VALUE formatter) {
     FILE *f;
     if ((f=fopen(RSTRING_PTR(filename),"r"))==NULL) {
@@ -158,7 +176,19 @@ static void wrapper_free(void *p) {
     free(p);
 }
 
-/* Create a new instance of the wrapper class */
+/* 
+ * call-seq:
+ *   Wrapper.new(helper_path) -> Wrapper instance
+ *
+ * Creates a new instance of the Python wrapper. Do not use this
+ * function directly. Instead, use the Rygments.highlight functions
+ * which will take care of handling the wrapper.
+ *
+ * Note: The Wrapper should be treated as a singleton. It is not designed
+ * to handle multiple instances. Furthermore, on Darwin initializing,
+ * finalizing and again initializing the Python interpreter results in
+ * segmentation faults.
+ */
 static VALUE wrapper_new(VALUE klass, VALUE path) {
     /* Patch the Python search path to include the rygments module path */
     printf("setting path to %s\n", RSTRING_PTR(path));
@@ -171,7 +201,17 @@ static VALUE wrapper_new(VALUE klass, VALUE path) {
     return tdata;
 }
 
-/* Ruby extension initializer */
+/* 
+ * This Ruby C extension defines a Rygments::Wrapper class.
+ *
+ * The Rygments::Wrapper class is a wrapper around the Python interpreter.
+ * This means that Pygments can be invoked multiple times without having
+ * to fork or reload anything, thus reducing the overhead to a minimum.
+ *
+ * As a Rygments user you do not have to deal with the wrapper system
+ * directly. Instead, you should use the static functions that are exposed 
+ * in the Rygments module.
+ */
 void Init_wrapper(void) {
     rygments_class = rb_define_module("Rygments");
     wrapper_class = rb_define_class_under(rygments_class, "Wrapper", rb_cObject);
