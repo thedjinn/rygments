@@ -191,7 +191,6 @@ static void wrapper_free(void *p) {
  */
 static VALUE wrapper_new(VALUE klass, VALUE path) {
     /* Patch the Python search path to include the rygments module path */
-    printf("setting path to %s\n", RSTRING_PTR(path));
     setenv("PYTHONPATH", RSTRING_PTR(path), 1);
     
     struct wrapper_struct *ptr = ALLOC(struct wrapper_struct);
