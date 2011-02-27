@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Emil Loer"]
   s.email       = ["emil@koffietijd.net"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/thedjinn/rygments"
   s.summary     = %q{Rygments is a Ruby wrapper for Pygments}
   s.description = %q{Rygments is a Ruby wrapper for the Pygments syntax highlighter. It uses an embedded Python interpreter to get high processing throughput.}
 
