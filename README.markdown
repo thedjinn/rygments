@@ -11,6 +11,8 @@ a new process. This difference in performance really pays off when
 you are highlighting lots of smaller code fragments, e.g. for blog
 posts.
 
+Compared to Albino (another popular Pygments Ruby wrapper) Rygments is over 30% faster when using it to highlight all files from the Ruby 1.9.2 source code.
+
 # Installation
 
 ## Pygments
