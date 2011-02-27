@@ -15,25 +15,30 @@
 
 #define log(x) (printf(">> %s\n",(x)));
 
+/* Structure containing the state of the embedded interpreter */
 struct wrapper_struct {
     PyObject *module;
     PyObject *rygmentize;
 };
 
+/* References to our created classes and modules */
 static VALUE rygments_class = Qnil;
 static VALUE wrapper_class = Qnil;
 
 /* This function places a string at a certain index in the given tuple */
 static int put_in_tuple(PyObject *tuple, int index, const char *string) {
+    /* Don't accept NULL pointers */
     if (string == NULL) {
         return 1;
     }
     
+    /* Duplicate the string */
     PyObject *pystr = PyString_FromString(string);
     if (pystr == NULL) {
         return 1;
     }
     
+    /* Inject it in the tuple */
     return PyTuple_SetItem(tuple, index, pystr);
 }
 
@@ -105,7 +110,7 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
     if (res) {
         Py_DECREF(pArgs);
         fprintf(stderr,"Bad arguments\n");
-        return 1;
+        return Qnil;
     }
 
     /* Call the function */
@@ -115,7 +120,7 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
     /* Check if we have a valid result */
     if (pValue == NULL) {
         fprintf(stderr,"Call failed\n");
-        return 1;
+        return Qnil;
     }
 
     /* Convert the pygmentized result to a Ruby string */
@@ -137,26 +142,32 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
  */
 static VALUE wrapper_highlight_file(VALUE self, VALUE filename, VALUE lexer, VALUE formatter) {
     FILE *f;
+
+    /* Open the file */
     if ((f=fopen(RSTRING_PTR(filename),"r"))==NULL) {
         printf("error: could not open file\n");
-        exit(EXIT_FAILURE);
+        return Qnil;
     }
     
+    /* Determine the file size */
     fseek(f,0,SEEK_END);
     long fsize=ftell(f);
     rewind(f);
     
+    /* Read the contents of the file into a buffer */
     char *buf=ALLOC_N(char, fsize);
     if ((fread(buf,1,fsize,f))!=(size_t)fsize) {
         printf("error: could not read from file \"\"\n");
         fclose(f);
-        exit(EXIT_FAILURE);
+        return Qnil;
     }
     fclose(f);
 
+    /* Convert the buffer to a Ruby string */
     VALUE code = rb_str_new(buf, fsize);
     free(buf);
 
+    /* Call the string highlighting method */
     return wrapper_highlight_string(self, code, lexer, formatter);
 }
 
@@ -164,15 +175,19 @@ static VALUE wrapper_highlight_file(VALUE self, VALUE filename, VALUE lexer, VAL
 static void wrapper_free(void *p) {
     struct wrapper_struct *s = (struct wrapper_struct *)p;
     
+    /* Decrese refcounts of the Python helper */
     Py_DECREF(s->rygmentize);
     Py_DECREF(s->module);
 
+    /* If we came here through an error we should print int */
     if (PyErr_Occurred()) {
         PyErr_Print();
     }
     
+    /* Free the Python interpreter */
     Py_Finalize();
 
+    /* Release our structure pointer */
     free(p);
 }
 
@@ -193,9 +208,11 @@ static VALUE wrapper_new(VALUE klass, VALUE path) {
     /* Patch the Python search path to include the rygments module path */
     setenv("PYTHONPATH", RSTRING_PTR(path), 1);
     
+    /* Initialize the Python interpreter and load the helper module */
     struct wrapper_struct *ptr = ALLOC(struct wrapper_struct);
     initialize(ptr);
 
+    /* Wrap the state structure */
     VALUE tdata = Data_Wrap_Struct(klass, 0, wrapper_free, ptr);
     return tdata;
 }
@@ -214,7 +231,9 @@ static VALUE wrapper_new(VALUE klass, VALUE path) {
 void Init_wrapper(void) {
     rygments_class = rb_define_module("Rygments");
     wrapper_class = rb_define_class_under(rygments_class, "Wrapper", rb_cObject);
+
     rb_define_singleton_method(wrapper_class, "new", wrapper_new, 1);
+
     rb_define_method(wrapper_class, "highlight_string", wrapper_highlight_string, 3);
     rb_define_method(wrapper_class, "highlight_file", wrapper_highlight_file, 3);
 }
