@@ -1,4 +1,4 @@
-require "wrapper"
+require File.expand_path(File.join(File.dirname(__FILE__), "..", "ext", "wrapper"))
 
 module Rygments
   # Perform syntax highlighting on a string.
@@ -15,9 +15,12 @@ module Rygments
 
   private
 
+  # The full filename of the Python helper script
+  HELPER_PATH = File.expand_path(File.join(File.dirname(__FILE__), "rygments"))
+
   # This function maintains a single instance of the Python wrapper 
   # extension.
   def self.wrapper
-    @wrapper ||= Rygments::Wrapper.new
+    @wrapper ||= Rygments::Wrapper.new(HELPER_PATH)
   end
 end

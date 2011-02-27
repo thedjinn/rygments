@@ -20,6 +20,7 @@ struct wrapper_struct {
     PyObject *rygmentize;
 };
 
+static VALUE rygments_class = Qnil;
 static VALUE wrapper_class = Qnil;
 
 /* This function places a string at a certain index in the given tuple */
@@ -41,9 +42,6 @@ static int put_in_tuple(PyObject *tuple, int index, const char *string) {
 static int initialize(struct wrapper_struct *s) {
     PyObject *module_name;
 
-    /* Patch the Python search path to include the rygments module path */
-    setenv("PYTHONPATH", ".", 1);
-    
     /* Initialize Python */
     Py_InitializeEx(0);
     
@@ -161,7 +159,11 @@ static void wrapper_free(void *p) {
 }
 
 /* Create a new instance of the wrapper class */
-static VALUE wrapper_new(VALUE klass) {
+static VALUE wrapper_new(VALUE klass, VALUE path) {
+    /* Patch the Python search path to include the rygments module path */
+    printf("setting path to %s\n", RSTRING_PTR(path));
+    setenv("PYTHONPATH", RSTRING_PTR(path), 1);
+    
     struct wrapper_struct *ptr = ALLOC(struct wrapper_struct);
     initialize(ptr);
 
@@ -170,9 +172,10 @@ static VALUE wrapper_new(VALUE klass) {
 }
 
 /* Ruby extension initializer */
-void Init_rygments(void) {
-    wrapper_class = rb_define_class("Wrapper", rb_cObject);
-    rb_define_singleton_method(wrapper_class, "new", wrapper_new, 0);
+void Init_wrapper(void) {
+    rygments_class = rb_define_module("Rygments");
+    wrapper_class = rb_define_class_under(rygments_class, "Wrapper", rb_cObject);
+    rb_define_singleton_method(wrapper_class, "new", wrapper_new, 1);
     rb_define_method(wrapper_class, "highlight_string", wrapper_highlight_string, 3);
     rb_define_method(wrapper_class, "highlight_file", wrapper_highlight_file, 3);
 }
