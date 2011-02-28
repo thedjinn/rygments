@@ -73,7 +73,14 @@ website.
 
 # Compatibility
 
-Rygments has been tested on OSX Snow Leopard (10.6.6) and Ubuntu Linux 10.10. If you used it with success on a different platform then please let me know so I can extend this list.
+Rygments has been tested and is known to work on Ruby Enterprise Edition 1.8.7-2011.01 and Ruby 1.9.2.
+
+It has been tested on the following platforms:
+
+ * OSX Snow Leopard (10.6.6)
+ * Ubuntu Linux (8.04 and 10.10)
+
+If you used it with success on a different Ruby implementation or platform then please let me know so I can extend this list.
 
 # License
 
