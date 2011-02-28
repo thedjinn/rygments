@@ -6,10 +6,10 @@ highlighter.
 Rygments differs from other implementations in that it embeds a full
 Python interpreter for the Pygments Python files as a Ruby C extension.
 This enables Rygments to reach a level of performance that is equal to
-invoking Pygments from a native Python application, and without the overhead forking
+invoking Pygments from a native Python application, and without the overhead of forking
 a new process. This difference in performance really pays off when
 you are highlighting lots of smaller code fragments, e.g. for blog
-posts.
+posts or documentation generators such as Rocco.
 
 Compared to Albino (another popular Pygments Ruby wrapper) Rygments is over 30% faster when using it to highlight all files from the Ruby 1.9.2 source code.
 
