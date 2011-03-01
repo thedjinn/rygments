@@ -3,3 +3,10 @@
 Gemfile.lock
 pkg/*
 doc/
+
+lib/rygments/*.pyc
+
+ext/Makefile
+ext/*.so
+ext/*.bundle
+ext/*.o
