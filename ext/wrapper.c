@@ -85,10 +85,7 @@ static int initialize(struct wrapper_struct *s) {
 
     /* Check if module was loaded successfully */
     if (s->module == NULL) {
-        PyErr_Print();
-        Py_Finalize();
-
-        rb_raise(rb_eRuntimeError, "Failed to load the rygments Python module");
+        reraise();
     }
     
     /* Get a reference to the rygmentize function */
