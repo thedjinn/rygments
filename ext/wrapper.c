@@ -176,21 +176,28 @@ static VALUE wrapper_highlight_file(VALUE self, VALUE filename, VALUE lexer, VAL
 
     /* Open the file */
     if ((f=fopen(RSTRING_PTR(filename),"r"))==NULL) {
-        printf("error: could not open file\n");
-        return Qnil;
+        rb_sys_fail("could not open file");
     }
     
     /* Determine the file size */
-    fseek(f,0,SEEK_END);
+    if (fseek(f,0,SEEK_END) == -1) {
+        rb_sys_fail("could not seek to end of file");
+    }
     long fsize=ftell(f);
+    if (fsize == -1) {
+        rb_sys_fail("could not determine file length");
+    }
     rewind(f);
     
     /* Read the contents of the file into a buffer */
     char *buf=ALLOC_N(char, fsize);
     if ((fread(buf,1,fsize,f))!=(size_t)fsize) {
-        printf("error: could not read from file \"\"\n");
+        /* Close file handle with cached errno value */
+        int err = errno;
         fclose(f);
-        return Qnil;
+        errno = err;
+
+        rb_sys_fail("could not read from file");
     }
     fclose(f);
 

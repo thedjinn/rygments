@@ -30,6 +30,12 @@ describe Rygments::Wrapper do
       subject.highlight_file(__FILE__, "ruby", "html").should be_a(String)
     end
 
+    it "should raise an exception when given a nonexisting filename" do
+      expect {
+        subject.highlight_file("this_file_does_not_exist", "ruby", "html")
+      }.to raise_error
+    end
+
     it "should raise an exception when given an invalid formatter" do
       expect {
         subject.highlight_file(__FILE__, "ruby", "awesome_nonexistant_formatter")
