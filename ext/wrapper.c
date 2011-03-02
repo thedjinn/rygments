@@ -97,7 +97,7 @@ static int initialize(struct wrapper_struct *s) {
         Py_DECREF(s->module);
 
         if (PyErr_Occurred()) {
-            PyErr_Print();
+            reraise();
         }
 
         Py_Finalize();
@@ -136,8 +136,7 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
     /* Check if we have bad arguments */
     if (res) {
         Py_DECREF(pArgs);
-        fprintf(stderr,"Bad arguments\n");
-        return Qnil;
+        rb_raise(rb_eRuntimeError, "bad input given");
     }
 
     /* Call the function */
