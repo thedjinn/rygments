@@ -40,6 +40,9 @@ require File.expand_path(File.join(File.dirname(__FILE__), "..", "ext", "wrapper
 # Author:: Emil Loer (http://emilloer.com)
 # License:: Licensed under the terms of the MIT license
 module Rygments
+  # The full filename of the Python helper script
+  HELPER_PATH = File.expand_path(File.join(File.dirname(__FILE__), "rygments"))
+
   # Perform syntax highlighting on a string.
   # Returns the highlighted string.
   def self.highlight_string(code, lexer = "ruby", formatter = "html")
@@ -51,11 +54,6 @@ module Rygments
   def self.highlight_file(filename, lexer = "ruby", formatter = "html")
     wrapper.highlight_file filename, lexer, formatter
   end
-
-  private
-
-  # The full filename of the Python helper script
-  HELPER_PATH = File.expand_path(File.join(File.dirname(__FILE__), "rygments"))
 
   # This function maintains a single instance of the Python wrapper 
   # extension.
