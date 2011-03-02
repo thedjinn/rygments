@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_development_dependency("rspec", ["~> 2.0"])
+  s.add_development_dependency("rake-compiler", ["~> 0.7"])
 
   s.has_rdoc = true
   s.extensions = ["ext/extconf.rb"]
