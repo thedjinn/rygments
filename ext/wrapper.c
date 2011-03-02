@@ -58,8 +58,9 @@ static int initialize(struct wrapper_struct *s) {
     /* Check if module was loaded successfully */
     if (s->module == NULL) {
         PyErr_Print();
-        fprintf(stderr, "Failed to load the rygments python module\n");
-        return 1;
+        Py_Finalize();
+
+        rb_raise(rb_eRuntimeError, "Failed to load the rygments Python module");
     }
     
     /* Get a reference to the rygmentize function */
@@ -74,8 +75,9 @@ static int initialize(struct wrapper_struct *s) {
             PyErr_Print();
         }
 
-        fprintf(stderr, "Cannot find the rygmentize function in the python module\n");
-        return 1;
+        Py_Finalize();
+
+        rb_raise(rb_eRuntimeError, "Cannot find the rygmentize function in the Python module");
     }
 
     return 0;
@@ -119,8 +121,9 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
 
     /* Check if we have a valid result */
     if (pValue == NULL) {
-        fprintf(stderr,"Call failed\n");
-        return Qnil;
+        PyErr_Print();
+
+        rb_raise(rb_eRuntimeError, "Call failed");
     }
 
     /* Convert the pygmentized result to a Ruby string */
@@ -174,7 +177,7 @@ static VALUE wrapper_highlight_file(VALUE self, VALUE filename, VALUE lexer, VAL
 /* Free the wrapper structure and deinitialize the Python interpreter */
 static void wrapper_free(void *p) {
     struct wrapper_struct *s = (struct wrapper_struct *)p;
-    
+
     /* Decrese refcounts of the Python helper */
     Py_DECREF(s->rygmentize);
     Py_DECREF(s->module);
@@ -183,7 +186,7 @@ static void wrapper_free(void *p) {
     if (PyErr_Occurred()) {
         PyErr_Print();
     }
-    
+
     /* Free the Python interpreter */
     Py_Finalize();
 
