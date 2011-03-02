@@ -123,6 +123,11 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
     PyObject *pArgs, *pValue;
     int res;
 
+    /* Make sure we have three strings as input */
+    Check_Type(code, T_STRING);
+    Check_Type(lexer, T_STRING);
+    Check_Type(formatter, T_STRING);
+
     /* Get the wrapper structure */
     Data_Get_Struct(self, struct wrapper_struct, s);
 
@@ -169,6 +174,9 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
  */
 static VALUE wrapper_highlight_file(VALUE self, VALUE filename, VALUE lexer, VALUE formatter) {
     FILE *f;
+
+    /* Make sure the filename is a string */
+    Check_Type(filename, T_STRING);
 
     /* Open the file */
     if ((f=fopen(RSTRING_PTR(filename),"r"))==NULL) {

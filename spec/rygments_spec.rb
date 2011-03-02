@@ -67,6 +67,24 @@ describe Rygments do
         Rygments.highlight_string("puts 'Hello World!", "awesome_nonexistant_lexer", "html")
       }.to raise_error
     end
+
+    it "should raise an exception when the first argument is not a string" do
+      expect {
+        Rygments.highlight_string(:no_string, "ruby", "html")
+      }.to raise_error
+    end
+
+    it "should raise an exception when the second argument is not a string" do
+      expect {
+        Rygments.highlight_string("puts 'Hello World!", :no_string, "html")
+      }.to raise_error
+    end
+
+    it "should raise an exception when the third argument is not a string" do
+      expect {
+        Rygments.highlight_string("puts 'Hello World!", "ruby", :no_string)
+      }.to raise_error
+    end
   end
   
   describe "#highlight_file" do
@@ -83,6 +101,24 @@ describe Rygments do
     it "should raise an exception when given an invalid lexer" do
       expect {
         Rygments.highlight_file(__FILE__, "awesome_nonexistant_lexer", "html")
+      }.to raise_error
+    end
+
+    it "should raise an exception when the first argument is not a string" do
+      expect {
+        Rygments.highlight_file(:no_string, "ruby", "html")
+      }.to raise_error
+    end
+
+    it "should raise an exception when the second argument is not a string" do
+      expect {
+        Rygments.highlight_file(__FILE__, :no_string, "html")
+      }.to raise_error
+    end
+
+    it "should raise an exception when the third argument is not a string" do
+      expect {
+        Rygments.highlight_file(__FILE__, "ruby", :no_string)
       }.to raise_error
     end
   end
