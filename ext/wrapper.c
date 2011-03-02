@@ -25,6 +25,34 @@ struct wrapper_struct {
 static VALUE rygments_class = Qnil;
 static VALUE wrapper_class = Qnil;
 
+/* This function collects a Python exception and raises it as a Ruby exception */
+static void reraise() {
+    PyObject *ptype, *pvalue, *ptraceback, *pystr = NULL;
+    VALUE rstr;
+
+    if (PyErr_Occurred()) {
+        /* Fetch and normalize information about the exception */
+        PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+        PyErr_NormalizeException(&ptype, &pvalue, &ptraceback);
+
+        /* Convert the Python exception string to a Ruby string */
+        if (pvalue != NULL && (pystr = PyObject_Str(pvalue)) != NULL && PyString_Check(pystr)) {
+            rstr = rb_str_new2(PyString_AsString(pystr));
+        } else {
+            rstr = rb_str_new2("An unknown Python exception was thrown");
+        }
+        Py_XDECREF(pystr);
+
+        /* Release the references given by PyErr_Fetch */
+        Py_DECREF(ptype);
+        Py_XDECREF(pvalue);
+        Py_XDECREF(ptraceback);
+
+        /* Raise a Ruby exception */
+        rb_raise(rb_eRuntimeError, "%s", RSTRING_PTR(rstr));
+    }
+}
+
 /* This function places a string at a certain index in the given tuple */
 static int put_in_tuple(PyObject *tuple, int index, const char *string) {
     /* Don't accept NULL pointers */
@@ -121,7 +149,7 @@ static VALUE wrapper_highlight_string(VALUE self, VALUE code, VALUE lexer, VALUE
 
     /* Check if we have a valid result */
     if (pValue == NULL) {
-        PyErr_Print();
+        reraise();
 
         rb_raise(rb_eRuntimeError, "Call failed");
     }
